@@ -1,0 +1,6 @@
+/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /Users/anuragkalra/workspaceComp598/sandbox/a1_v2/a1_starter
+OpenGL Found
+GLEW Found
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/anuragkalra/workspaceComp598/sandbox/a1_v2/a1_starter/cmake-build-debug
