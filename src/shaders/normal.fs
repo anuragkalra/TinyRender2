@@ -12,4 +12,5 @@ out vec3 color;
 
 void main() {
     // TODO: Implement this
+    color = vNormal;
 }

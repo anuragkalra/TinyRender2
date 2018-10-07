@@ -88,6 +88,9 @@ struct NormalPass : RenderPass {
              * 2) Draw its triangles.
              * 3) Bind vertex array to 0.
              */
+            glBindVertexArray(object.vao);
+            glDrawArrays(GL_TRIANGLES, 0, object.nVerts);
+            glBindVertexArray(0);
             // TODO: Implement this
         }
 

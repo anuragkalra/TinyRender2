@@ -18,4 +18,6 @@ out vec3 vNormal;
 
 void main() {
 	// TODO: Implement this
+	gl_Position = projection * view * model * vec4(position, 1.0);
+    vNormal = abs(normal);
 }

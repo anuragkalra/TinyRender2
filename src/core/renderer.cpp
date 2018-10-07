@@ -63,13 +63,70 @@ bool Renderer::init(const bool isRealTime, bool nogui) {
 
 void Renderer::render() {
     if (realTime) {
-        /**
-         * 1) Detect and handle the quit event.
-         * 2) Call the render function using renderpass->render().
-         * 3) Output the rendered image into the GUI window using SDL_GL_SwapWindow(renderpass->window).
-         */
+        bool isRunning = true;
+        SDL_Event ev;
+
+        while(isRunning) {
+
+            while(SDL_PollEvent(&ev) != 0) {
+                if (ev.type == SDL_QUIT) {
+                    isRunning = false;
+                    SDL_Quit();
+                }
+            }
+            renderpass->render();
+            SDL_GL_SwapWindow(renderpass->window);
+        }
+
+        return;
         // TODO: Implement this
     } else {
+
+        v3f EYE = scene.config.camera.o;
+        v3f AT = scene.config.camera.at;
+        v3f UP = scene.config.camera.up;
+        float fov = scene.config.camera.fov;
+
+        //TODO 1.2 : Calculate the Camera-to-World transformation matrix - COMPLETE
+        //Building a look at view matrix
+        mat4f inverseView = glm::lookAt(EYE, AT, UP);
+        float aspectRatio = (float) scene.config.width / (float) scene.config.height;
+        cout << aspectRatio << endl;
+
+        float scale = tan(deg2rad*(fov * 0.5));
+
+        //Clear rgb buffer and instantiate sampler
+        integrator->rgb->clear();
+        Sampler sampler = Sampler(8008);
+
+        int pixelX = 0;
+        int pixelY = 0;
+
+        for(pixelX = 0; pixelX < scene.config.width; pixelX++) {
+            for(pixelY = 0; pixelY < scene.config.height; pixelY++) {
+                //(px, py) = getPixelLocation(x, y, width, height)
+                //dir = toWorld(px, py)
+                //ray = Ray(EYE, dir)
+                //pixelColor = render(ray, sampler)
+                //splatOnScreen(x, y, pixelColor)
+                float pixelNDCX = (pixelX + 0.5) / (float) scene.config.width;  //0.5 -> 4.5
+                float pixelNDCY = (pixelY + 0.5) / (float) scene.config.height; //0.5 -> 3.5
+                float pixelScreenX = 2 * pixelNDCX - 1;
+                float pixelScreenY = 1 - 2 * pixelNDCY;
+                float pixelCameraX = (pixelScreenX) * aspectRatio * scale;
+                float pixelCameraY = (pixelScreenY) * scale;
+                v3f dir = v3f(pixelCameraX, pixelCameraY, -1.f);
+                v4f direction = glm::normalize(v4f(dir, 0.f) * inverseView);
+                Ray ray = Ray(scene.config.camera.o, direction);
+                v3f color = integrator->render(ray, sampler);
+                integrator->rgb->data[scene.config.width * pixelY + pixelX] = color;
+            }
+        }
+
+        //integrator->rgb->data[1280] = v3f(1.0f, 0.0f, 0.0f);
+        //integrator->rgb->data[1281] = v3f(0.0f, 1.0f, 0.0f);
+        //integrator->rgb->data[1282] = v3f(0.0f, 0.0f, 1.0f);
+
         /**
          * 1) Calculate the camera perspective, the camera-to-world transformation matrix and the aspect ratio.
          * 2) Clear integral RGB buffer.
